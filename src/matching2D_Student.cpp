@@ -15,11 +15,23 @@ void matchDescriptors(
     if (matcherType.compare("MAT_BF") == 0)
     {
         int normType = cv::NORM_HAMMING;
+        if (descriptorType == "DES_HOG")
+        {
+            normType = cv::NORM_L2;
+        }
         matcher = cv::BFMatcher::create(normType, crossCheck);
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
     {
-        // ...
+
+        if (descriptorType == "DES_HOG")
+        {
+            matcher = cv::FlannBasedMatcher::create();
+        }
+        else
+        {
+            matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(20, 10, 2));
+        }
     }
 
     // perform matching task
@@ -31,7 +43,17 @@ void matchDescriptors(
     else if (selectorType.compare("SEL_KNN") == 0)
     { // k nearest neighbors (k=2)
 
-        // ...
+        std::vector<std::vector<cv::DMatch>> knnMatches;
+        matcher->knnMatch(descSource, descRef, knnMatches, 2);
+
+        const float ratio_thresh = 0.8f;
+        for (size_t i = 0; i < knnMatches.size(); i++)
+        {
+            if (knnMatches[i][0].distance < ratio_thresh * knnMatches[i][1].distance)
+            {
+                matches.push_back(knnMatches[i][0]);
+            }
+        }
     }
 }
 
