@@ -4,8 +4,9 @@
 using namespace std;
 
 // Find best matches for keypoints in two camera images based on several matching methods
-void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::KeyPoint> &kPtsRef, cv::Mat &descSource, cv::Mat &descRef,
-                      std::vector<cv::DMatch> &matches, std::string descriptorType, std::string matcherType, std::string selectorType)
+void matchDescriptors(
+    std::vector<cv::KeyPoint>& kPtsSource, std::vector<cv::KeyPoint>& kPtsRef, cv::Mat& descSource, cv::Mat& descRef,
+    std::vector<cv::DMatch>& matches, std::string descriptorType, std::string matcherType, std::string selectorType)
 {
     // configure matcher
     bool crossCheck = false;
@@ -35,7 +36,7 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 }
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
-void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
+void descKeypoints(vector<cv::KeyPoint>& keypoints, cv::Mat& img, cv::Mat& descriptors, string descriptorType)
 {
     // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
@@ -62,7 +63,7 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
-void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
+void detKeypointsShiTomasi(vector<cv::KeyPoint>& keypoints, cv::Mat& img, bool bVis)
 {
     // compute detector parameters based on image size
     int blockSize = 4;       //  size of an average block for computing a derivative covariation matrix over each pixel neighborhood
