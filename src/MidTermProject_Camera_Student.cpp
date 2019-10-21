@@ -100,7 +100,18 @@ int main(int argc, const char* argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            auto keypointIter = keypoints.begin();
+            while (keypointIter != keypoints.end())
+            {
+                if (!vehicleRect.contains(keypointIter->pt))
+                {
+                    keypoints.erase(keypointIter);
+                }
+                else
+                {
+                    ++keypointIter;
+                }
+            }
         }
 
         //// EOF STUDENT ASSIGNMENT
