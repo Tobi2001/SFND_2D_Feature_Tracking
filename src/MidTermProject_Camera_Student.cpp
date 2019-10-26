@@ -41,7 +41,13 @@ int main(int argc, const char* argv[])
     bool bVis = false;            // visualize results
 
     /* MAIN LOOP OVER ALL IMAGES */
-
+    std::stringstream ss;
+    double averageKeypointTime = 0.0;
+    double averageKeypoints = 0.0;
+    double averageDescriptorTime = 0.0;
+    double averageMatches = 0.0;
+    double averageMatchRatio = 0.0;
+    int validImageCount = 0;
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
         /* LOAD IMAGE INTO BUFFER */
@@ -75,9 +81,10 @@ int main(int argc, const char* argv[])
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
-        //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
+        //// -> SHITOMASI, HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
 
         bool visualizeKeypoints = false;
+        auto timeKeypointsStart = std::chrono::high_resolution_clock::now();
         if (detectorType.compare("SHITOMASI") == 0)
         {
             detKeypointsShiTomasi(keypoints, imgGray, visualizeKeypoints);
@@ -90,6 +97,9 @@ int main(int argc, const char* argv[])
         {
             detKeypointsModern(keypoints, imgGray, detectorType, visualizeKeypoints);
         }
+        double timeKeypointDetection = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - timeKeypointsStart).count() / 1000.0;
+        averageKeypointTime += timeKeypointDetection;
         //// EOF STUDENT ASSIGNMENT
 
         //// STUDENT ASSIGNMENT
@@ -113,7 +123,8 @@ int main(int argc, const char* argv[])
                 }
             }
         }
-
+        ss << keypoints.size() << " " << std::fixed << std::setprecision(2) << timeKeypointDetection;
+        averageKeypoints += keypoints.size();
         //// EOF STUDENT ASSIGNMENT
 
         // optional : limit number of keypoints (helpful for debugging and learning)
@@ -142,8 +153,13 @@ int main(int argc, const char* argv[])
 
         cv::Mat descriptors;
         string descriptorType = "BRISK"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+        auto timeDescKeypointsStart = std::chrono::high_resolution_clock::now();
         descKeypoints(dataBuffer.at(0).keypoints, dataBuffer.at(0).cameraImg, descriptors,
             descriptorType);
+        double timeDescriptors = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - timeDescKeypointsStart).count() / 1000.0;
+        ss << " " << timeDescriptors;
+        averageDescriptorTime += timeDescriptors;
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
@@ -168,6 +184,17 @@ int main(int argc, const char* argv[])
             matchDescriptors(dataBuffer.at(1).keypoints, dataBuffer.at(0).keypoints,
                 dataBuffer.at(1).descriptors, dataBuffer.at(0).descriptors,
                 matches, descriptorType, matcherType, selectorType);
+
+            ss << " " << matches.size();
+            if (keypoints.size() > 0)
+            {
+                double matchRatio = matches.size() / static_cast<double>(keypoints.size());
+                ss << " " << matchRatio;
+                ++validImageCount;
+                averageMatchRatio += matchRatio;
+            }
+            ss << std::endl;
+            averageMatches += matches.size();
 
             //// EOF STUDENT ASSIGNMENT
 
@@ -195,8 +222,22 @@ int main(int argc, const char* argv[])
             }
             bVis = false;
         }
+        else
+        {
+            ss << std::endl;
+        }
 
     } // eof loop over all images
+
+    // evaluation
+    std::cout << std::endl << "Evaluation:" << std::endl << ss.str() << std::endl;
+    std::cout << "Average:" << std::endl;
+    std::cout << std::fixed << std::setprecision(2) <<
+        averageKeypoints / 10.0 << " " <<
+        averageKeypointTime / 10.0 << " " <<
+        averageDescriptorTime / 10.0 << " " <<
+        averageMatches / 9.0 << " " << averageMatchRatio / validImageCount << std::endl;
+
 
     return 0;
 }

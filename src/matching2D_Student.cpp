@@ -150,7 +150,7 @@ void detKeypointsHarris(std::vector<cv::KeyPoint>& keypoints, cv::Mat& img, bool
 {
     int blockSize = 2;
     int apertureSize = 3;
-    int minResponse = 80;
+    int minResponse = 100;
     double k = 0.04;
 
     double t = static_cast<double>(cv::getTickCount());
