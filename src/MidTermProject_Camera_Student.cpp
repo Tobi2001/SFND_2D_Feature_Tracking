@@ -230,8 +230,8 @@ int main(int argc, const char* argv[])
     } // eof loop over all images
 
     // evaluation
-    std::cout << std::endl << "Evaluation:" << std::endl << ss.str() << std::endl;
-    std::cout << "Average:" << std::endl;
+    std::cout << std::endl << "Evaluation:" << std::endl << ss.str();
+    std::cout << std::string(30, '-') << std::endl;
     std::cout << std::fixed << std::setprecision(2) <<
         averageKeypoints / 10.0 << " " <<
         averageKeypointTime / 10.0 << " " <<
